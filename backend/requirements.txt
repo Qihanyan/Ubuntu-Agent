@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+langchain-openai
+langchain-core
+requests
+websockets
+
+langchain-openai
+langchain-core
+pydantic
+requests
