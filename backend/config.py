@@ -1,3 +1,0 @@
-ONE_API_BASE_URL = "http://192.168.1.133:7086/v1"
-ONE_API_KEY = "sk-YfAcgkoZLPwtNPluF54cAaCaFe2b48F4Bf8cA6943d988e9f"
-N8N_BASE_URL = "http://192.168.1.133:5678"  # 下载还是走 n8n，这个保留

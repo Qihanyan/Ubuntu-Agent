@@ -2,3 +2,5 @@
 ./music/cookies.txt
 /backend/.venv
 ./backend/.venv
+/backend/config.py
+./backend/config.py
