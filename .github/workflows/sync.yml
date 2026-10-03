@@ -1,0 +1,56 @@
+name: Sync From Gitee
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync branches from Gitee to main
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$GITEE_TOKEN" ]; then
+            echo "ERROR: GITEE_TOKEN is empty."
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # 1. 备份当前的 workflow 文件
+          mkdir -p /tmp/gh-workflows
+          cp -r .github /tmp/gh-workflows/
+
+          # 2. 清洗 Token
+          CLEAN_GITEE_TOKEN=$(echo "$GITEE_TOKEN" | tr -d '\r\n ')
+          CLEAN_GH_TOKEN=$(echo "$GH_TOKEN" | tr -d '\r\n ')
+
+          # 3. 拉取 Gitee 的 master 分支
+          git remote add gitee "https://qi-hanyan:${CLEAN_GITEE_TOKEN}@gitee.com/qi-hanyan/Ubuntu-Agent.git"
+          echo "Fetching updates from Gitee..."
+          git fetch gitee master
+
+          # 4. 切换到 gitee/master 分支的内容
+          git checkout -B main gitee/master
+
+          # 5. 把刚刚备份的 .github 工作流文件放回根目录并提交（确保 workflow 永远存在于 main）
+          cp -r /tmp/gh-workflows/.github ./
+          git add .github/
+          # 如果有变动则 commit，没有变动则跳过
+          git commit -m "chore: preserve sync workflow in main branch [skip ci]" || true
+
+          # 6. 强制推送到 GitHub 的 main 分支
+          git remote set-url origin "https://x-access-token:${CLEAN_GH_TOKEN}@github.com/Qihanyan/Ubuntu-Agent.git"
+          git push origin main --force
