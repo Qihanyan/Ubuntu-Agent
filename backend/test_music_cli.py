@@ -5,16 +5,7 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool, tool
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
-
-# ==========================================
-# 1. 基础配置区 (基础设施与网关配置)
-# ==========================================
-# one-api 网关配置：LangChain 会将符合 OpenAI 规范的请求发送至此
-ONE_API_BASE_URL = "http://192.168.1.133:7086/v1"
-ONE_API_KEY = "sk-YfAcgkoZLPwtNPluF54cAaCaFe2b48F4Bf8cA6943d988e9f"  # 你的 one-api 令牌
-
-# n8n Webhook 根地址：Python 代码通过 HTTP POST 触发 n8n 工作流
-N8N_BASE_URL = "http://192.168.1.133:5678"                       # 你的 n8n 服务地址
+from config import ONE_API_BASE_URL, ONE_API_KEY, N8N_BASE_URL
 
 
 # ==========================================
