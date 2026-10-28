@@ -4,3 +4,7 @@
 ./backend/.venv
 /backend/config.py
 ./backend/config.py
+/credential.json
+./credential.json
+/config.py
+./config.py
