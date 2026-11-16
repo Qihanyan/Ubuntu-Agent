@@ -1,0 +1,15 @@
+services:
+  ollama:
+    image: ollama/ollama:latest   # 跑通后建议固定成具体版本号
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:11434:11434"   # 只监听本机，不对外
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=-1      # 模型常驻内存，避免空闲 5 分钟后被卸载、下次冷启动变慢
+    cpus: 2                       # 4 核里最多用 2 核，避免和下载转码抢 CPU
+
+volumes:
+  ollama_data:

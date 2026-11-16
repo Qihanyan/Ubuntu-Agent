@@ -1,8 +1,10 @@
 from pathlib import Path
 from urllib.parse import quote
+from typing import Type
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 from opencc import OpenCC
+from tools.schemas import StrictModel, ToolValidationHandler, format_tool_validation_error
 
 MSTREAM_BASE_URL = "http://192.168.1.133:1999/files"
 
@@ -24,8 +26,9 @@ def normalize_variants(text: str) -> set[str]:
     return {text.lower(), simplified.lower(), traditional.lower()}
 
 
-class SearchMusicInput(BaseModel):
-    query: str = Field(description="用户想搜索的歌曲名、歌手名或关键词")
+class SearchMusicInput(StrictModel):
+    # min_length=1：空字符串是任何文件名的子串，会匹配全部文件
+    query: str = Field(min_length=1, max_length=100, description="用户想搜索的歌曲名、歌手名或关键词")
 
 class SearchMusicTool(BaseTool):
     name: str = "search_music"
@@ -33,7 +36,8 @@ class SearchMusicTool(BaseTool):
         "当用户想要查找/搜索/播放某首已经下载过的歌曲时使用（而不是下载新歌）。"
         "支持繁简体自动匹配，会模糊匹配歌手名或歌曲名，返回可直接播放的链接。"
     )
-    args_schema: type = SearchMusicInput
+    args_schema: Type[BaseModel] = SearchMusicInput
+    handle_validation_error: ToolValidationHandler = format_tool_validation_error
 
     def _run(self, query: str) -> str:
         query_variants = normalize_variants(query)
