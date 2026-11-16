@@ -1,0 +1,5 @@
+# 在原有依赖之外新增（测试时使用 chromadb 1.5.9）
+chromadb==1.5.9
+httpx
+PyJWT
+bcrypt
