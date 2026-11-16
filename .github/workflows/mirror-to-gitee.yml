@@ -1,0 +1,35 @@
+name: Mirror To Gitee
+
+# GitHub 是唯一的源头；main 有新提交时推送到 Gitee 的 master。
+# 用普通推送而不是 --force：如果有人直接往 Gitee 推了提交，这里会失败报错，
+# 而不是悄悄覆盖掉那些提交。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: mirror-to-gitee
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push main to Gitee master
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          if [ -z "$GITEE_TOKEN" ]; then
+            echo "ERROR: GITEE_TOKEN is empty."
+            exit 1
+          fi
+          TOKEN=$(printf '%s' "$GITEE_TOKEN" | tr -d '\r\n ')
+          git push "https://qi-hanyan:${TOKEN}@gitee.com/qi-hanyan/Ubuntu-Agent.git" "HEAD:refs/heads/master"
